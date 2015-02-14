@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="Platform.Service.Implement.ServiceImpl" CodeBehind="DuplexChannelService.svc.cs" %>
