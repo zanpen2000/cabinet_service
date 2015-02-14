@@ -31,18 +31,11 @@ namespace Platform.ServiceHost
 
             serviceHost = new System.ServiceModel.ServiceHost(typeof(ServiceImpl));
 
-            SubscriberCollection.Default.OnBoardcastError += Default_OnBoardcastError;
-
             serviceHost.Opened += serviceHost_Opened;
             serviceHost.Closed += serviceHost_Closed;
             serviceHost.Opening += serviceHost_Opening;
             serviceHost.Closing += serviceHost_Closing;
             serviceHost.Open();
-        }
-
-        void Default_OnBoardcastError(ISubscriber subscriber, Exception ex)
-        {
-            Log.AppendInfo(string.Format("广播错误\r\n客户端:{0}\r\n提示信息：{1}", subscriber.Mac, ex.Message));
         }
 
         void serviceHost_Closing(object sender, EventArgs e)

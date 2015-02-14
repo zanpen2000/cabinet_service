@@ -39,9 +39,16 @@ namespace Platform.Model
 
         private SubscriberCollection()
         {
+            this.OnBoardcastError += SubscriberCollection_OnBoardcastError;
             _subscribers = new ItemCollection<ISubscriber>("subscribers");
             _subscribers.OnItemAdd += _subscribers_OnItemAdd;
             _subscribers.OnItemRemove += _subscribers_OnItemRemove;
+        }
+
+        private void SubscriberCollection_OnBoardcastError(ISubscriber subscriber, Exception ex)
+        {
+            var msg = string.Format("客户端{0}({1})广播异常", subscriber.Name, subscriber.Mac);
+            Log.AppendErrorInfo(msg, ex);
         }
 
         #endregion
