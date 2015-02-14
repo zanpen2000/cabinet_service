@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Platform.Model.Interfaces;
 
 namespace Platform.Model
 {
@@ -17,7 +18,7 @@ namespace Platform.Model
         private readonly BlockingCollection<T> _items;
         public ItemCollection(string name)
         {
-            this.Name = name;
+            Name = name;
             _items = new BlockingCollection<T>();
         }
 
@@ -37,10 +38,17 @@ namespace Platform.Model
             }
         }
 
-        public void Remove(Func<T, bool> predicate)
+        public IEnumerable<T> Take(Func<T, bool> predicate)
         {
-            var obj = (T)_items.TakeWhile(predicate);
-            OnItemRemove(obj);
+            var obj = (IEnumerable<T>)_items.TakeWhile(predicate);
+            var enumerable = obj as IList<T> ?? obj.ToList();
+
+            foreach (var item in enumerable)
+            {
+                OnItemRemove(t: item);    
+            }
+            
+            return enumerable;
         }
 
         public IEnumerator<T> GetEnumerator()

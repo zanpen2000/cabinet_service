@@ -61,7 +61,12 @@ namespace Platform.Model
         public void Remove(Func<ISubscriber, bool> func)
         {
             if (_subscribers.Count(func) <= 0) return;
-            _subscribers.Remove(func);
+            var subs = _subscribers.Take(func);
+
+            foreach (var subscriber in subs)
+            {
+                OnCollectionChanged(subscriber, OnlineState.Offline);
+            }
         }
 
         public void Add(ISubscriber subscriber)
@@ -70,11 +75,14 @@ namespace Platform.Model
             switch (count)
             {
                 case 1:
-                    _subscribers.Remove(sub => sub.Mac == subscriber.Mac);
+                    _subscribers.Take(sub => sub.Mac == subscriber.Mac);
+                    OnCollectionChanged(subscriber, OnlineState.Offline);
                     _subscribers.Add(subscriber);
+                    OnCollectionChanged(subscriber, OnlineState.Online);
                     break;
                 case 0:
                     _subscribers.Add(subscriber);
+                    OnCollectionChanged(subscriber, OnlineState.Online);
                     break;
                 default:
                     throw new Exception("不是唯一的订阅者");
@@ -114,9 +122,9 @@ namespace Platform.Model
         public void Boardcast(IEnumerable<string> macs, string message)
         {
             foreach (var sub in from sub in _subscribers
-                let enumerable = (IList<string>) (macs as IList<string> ?? macs.ToList())
-                where enumerable.Contains(sub.Mac)
-                select sub)
+                                let enumerable = (IList<string>)(macs as IList<string> ?? macs.ToList())
+                                where enumerable.Contains(sub.Mac)
+                                select sub)
             {
                 try
                 {
@@ -130,7 +138,7 @@ namespace Platform.Model
         }
 
         public event BoardcastEventHandler OnBoardcastError = delegate { };
-        public event CollectionChangedEventHandler OnCollectionChanged = delegate { }; 
+        public event CollectionChangedEventHandler OnCollectionChanged = delegate { };
 
         private void BoardcastError(ISubscriber subscriber, Exception ex)
         {

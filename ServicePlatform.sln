@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.ServiceHost", "Platform.ServiceHost\Platform.ServiceHost.csproj", "{AF3AFF62-CE75-43CF-A543-EC62055C24EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{613FE1BB-85A1-4126-97A1-FD8F996224D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{AF3AFF62-CE75-43CF-A543-EC62055C24EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF3AFF62-CE75-43CF-A543-EC62055C24EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF3AFF62-CE75-43CF-A543-EC62055C24EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{613FE1BB-85A1-4126-97A1-FD8F996224D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{613FE1BB-85A1-4126-97A1-FD8F996224D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{613FE1BB-85A1-4126-97A1-FD8F996224D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{613FE1BB-85A1-4126-97A1-FD8F996224D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
