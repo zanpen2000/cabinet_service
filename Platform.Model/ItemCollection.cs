@@ -38,19 +38,12 @@ namespace Platform.Model
             }
         }
 
-        public IEnumerable<T> Take(Func<T, bool> predicate)
+        public void Remove(Func<T, bool> predicate)
         {
-            var obj = (IEnumerable<T>)_items.TakeWhile(predicate);
-            var enumerable = obj as IList<T> ?? obj.ToList();
-
-            foreach (var item in enumerable)
-            {
-                OnItemRemove(t: item);    
-            }
-            
-            return enumerable;
+            _items.TakeWhile(predicate);
         }
 
+      
         public IEnumerator<T> GetEnumerator()
         {
             return _items.TakeWhile(item => item != null).GetEnumerator();

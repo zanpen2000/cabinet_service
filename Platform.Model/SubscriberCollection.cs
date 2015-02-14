@@ -61,12 +61,7 @@ namespace Platform.Model
         public void Remove(Func<ISubscriber, bool> func)
         {
             if (_subscribers.Count(func) <= 0) return;
-            var subs = _subscribers.Take(func);
-
-            foreach (var subscriber in subs)
-            {
-                OnCollectionChanged(subscriber, OnlineState.Offline);
-            }
+            _subscribers.Remove(func);
         }
 
         public void Add(ISubscriber subscriber)
@@ -75,14 +70,14 @@ namespace Platform.Model
             switch (count)
             {
                 case 1:
-                    _subscribers.Take(sub => sub.Mac == subscriber.Mac);
-                    OnCollectionChanged(subscriber, OnlineState.Offline);
+                    _subscribers.Remove(sub => sub.Mac == subscriber.Mac);
+                    _subscribers_OnItemRemove(subscriber);
                     _subscribers.Add(subscriber);
-                    OnCollectionChanged(subscriber, OnlineState.Online);
+                    _subscribers_OnItemAdd(subscriber);
                     break;
                 case 0:
                     _subscribers.Add(subscriber);
-                    OnCollectionChanged(subscriber, OnlineState.Online);
+                    _subscribers_OnItemAdd(subscriber);
                     break;
                 default:
                     throw new Exception("不是唯一的订阅者");
@@ -138,7 +133,6 @@ namespace Platform.Model
         }
 
         public event BoardcastEventHandler OnBoardcastError = delegate { };
-        public event CollectionChangedEventHandler OnCollectionChanged = delegate { };
 
         private void BoardcastError(ISubscriber subscriber, Exception ex)
         {

@@ -31,7 +31,6 @@ namespace Platform.ServiceHost
 
             serviceHost = new System.ServiceModel.ServiceHost(typeof(ServiceImpl));
 
-            SubscriberCollection.Default.OnCollectionChanged += Default_OnCollectionChanged;
             SubscriberCollection.Default.OnBoardcastError += Default_OnBoardcastError;
 
             serviceHost.Opened += serviceHost_Opened;
@@ -44,11 +43,6 @@ namespace Platform.ServiceHost
         void Default_OnBoardcastError(ISubscriber subscriber, Exception ex)
         {
             Log.AppendInfo(string.Format("广播错误\r\n客户端:{0}\r\n提示信息：{1}", subscriber.Mac, ex.Message));
-        }
-
-        void Default_OnCollectionChanged(ISubscriber subscriber, OnlineState state)
-        {
-            Log.AppendInfo(string.Format("客户端 {0}:{1}", subscriber.Mac, state.ToString()));
         }
 
         void serviceHost_Closing(object sender, EventArgs e)
