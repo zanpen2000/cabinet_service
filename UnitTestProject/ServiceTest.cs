@@ -4,12 +4,14 @@ using Platform.Service.Contracts;
 using Platform.Service.Implement;
 using Platform.Layer;
 using Platform.Model.Tests;
+using System.Threading.Tasks;
 
 namespace Platform.Service.Implement.Tests
 {
     [TestClass()]
     public class ServiceTest : IDuplexChannelCallback
     {
+        private ISingleChannelService SingleService;
         private IDuplexChannelService DuplexService;
 
         private int ClientCount;
@@ -19,6 +21,7 @@ namespace Platform.Service.Implement.Tests
             ClientCount = 0;
             i = 0;
             DuplexService = ProxyFactory.GetProxy<IDuplexChannelService, IDuplexChannelCallback>(this);
+            SingleService = ProxyFactory.GetProxy<ISingleChannelService>();
         }
 
         private TestContext testContextInstance;
@@ -99,6 +102,26 @@ namespace Platform.Service.Implement.Tests
             {
                 System.Threading.Thread.Sleep(500);
             }
+        }
+
+        [TestMethod()]
+        public void HeartbeatTest()
+        {
+            byte result = SingleService.Heartbeat(1);
+
+            Assert.AreEqual(1, result);
+        }
+
+        [TestMethod()]
+        public void HeartBeatHardTest()
+        {
+            //本机并发心跳测试，100万心跳耗时2分钟，10W心跳耗时17秒
+
+            Parallel.For(0, 100000, i =>
+            {
+                byte result = SingleService.Heartbeat((byte)i);
+                Assert.AreEqual((byte)i, result);
+            });
         }
     }
 }
