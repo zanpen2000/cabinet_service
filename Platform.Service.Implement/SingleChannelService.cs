@@ -1,4 +1,6 @@
-﻿using Platform.Service.Contracts;
+﻿using Platform.Model;
+using Platform.Service.Contracts;
+using System.Linq;
 
 namespace Platform.Service.Implement
 {
@@ -30,6 +32,12 @@ namespace Platform.Service.Implement
         public byte Heartbeat(byte b)
         {
             return b;
+        }
+
+        public System.Collections.Generic.List<string> GetClients()
+        {
+            var lst = from n in SubscriberCollection.Default.Subscribers select n.Mac;
+            return lst.ToList();
         }
     }
 }

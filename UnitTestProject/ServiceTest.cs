@@ -13,7 +13,7 @@ namespace Platform.Service.Implement.Tests
     {
         private ISingleChannelService SingleService;
         private IDuplexChannelService DuplexService;
-
+        private string notifyMsg;
         private int ClientCount;
 
         public ServiceTest()
@@ -76,7 +76,8 @@ namespace Platform.Service.Implement.Tests
 
         public void NotifyMessage(string msg)
         {
-            TestContext.WriteLine(msg);
+            notifyMsg = msg;
+            TestContext.WriteLine("接收广播：" + msg);
             ++i;
         }
 
@@ -116,12 +117,49 @@ namespace Platform.Service.Implement.Tests
         public void HeartBeatHardTest()
         {
             //本机并发心跳测试，100万心跳耗时2分钟，10W心跳耗时17秒
-
             Parallel.For(0, 100000, i =>
             {
                 byte result = SingleService.Heartbeat((byte)i);
                 Assert.AreEqual((byte)i, result);
             });
+        }
+
+        [TestMethod()]
+        public void BroadcastTest()
+        {
+            i = 0;
+            DuplexService.Online("c1", "c1_mac");
+            waitCallback();
+
+            i = 0;
+            DuplexService.Online("c2", "c2_mac");
+            waitCallback();
+
+            i = 0;
+            DuplexService.Broadcast("1");
+            waitCallback();
+
+            Assert.AreEqual("1", notifyMsg);
+        }
+
+        [TestMethod()]
+        public void RepeatRegClientTest()
+        {
+            i = 0;
+            DuplexService.Online("c1", "c1_mac");
+            waitCallback();
+
+            i = 0;
+            DuplexService.Online("c1", "c1_mac");
+            waitCallback();
+
+            i = 0;
+            DuplexService.Online("c2", "c2_mac");
+            waitCallback();
+
+            var clients = SingleService.GetClients();
+
+            Assert.AreEqual(2, clients.Count);
         }
     }
 }

@@ -8,5 +8,11 @@ namespace Platform.Service.Implement
         {
             return SingleChannelService.Default.Heartbeat(b);
         }
+
+
+        System.Collections.Generic.List<string> ISingleChannelService.GetClients()
+        {
+            return SingleChannelService.Default.GetClients();
+        }
     }
 }

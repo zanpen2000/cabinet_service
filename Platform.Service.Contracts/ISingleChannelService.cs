@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System.Collections.Generic;
+using System.ServiceModel;
 
 namespace Platform.Service.Contracts
 {
@@ -10,6 +11,7 @@ namespace Platform.Service.Contracts
         byte Heartbeat(byte b);
 
 
-
+        [OperationContract]
+        List<string> GetClients();
     }
 }
