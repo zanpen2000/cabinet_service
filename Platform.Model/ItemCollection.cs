@@ -15,11 +15,14 @@ namespace Platform.Model
         public event ItemCollectionItemAddEventHandler<T> OnItemAdd = delegate { };
         public event ItemCollectionItemRemoveEventHandler<T> OnItemRemove = delegate { };
 
-        private readonly BlockingCollection<T> _items;
+        private readonly List<T> _items;
+
+        private static object _lock = new object();
+
         public ItemCollection(string name)
         {
             Name = name;
-            _items = new BlockingCollection<T>();
+            _items = new List<T>();
         }
 
         public string Name { get; set; }
@@ -31,19 +34,56 @@ namespace Platform.Model
 
         public void Add(T t)
         {
-            if (!_items.Contains(t))
+            lock (_lock)
             {
+                if (_items.Contains(t)) return;
                 _items.Add(t);
                 OnItemAdd(t);
             }
         }
 
-        public void Remove(Func<T, bool> predicate)
+        public IEnumerable<T> TakeWhile(Func<T, bool> predicate)
         {
-            _items.TakeWhile(predicate);
+            lock (_lock)
+            {
+                var lst = new List<T>(_items.TakeWhile(predicate));
+                foreach (var l in lst)
+                {
+                    if (_items.Remove(l))
+                        OnItemRemove(l);
+                }
+
+                return lst;
+            }
         }
 
-      
+        public T Take()
+        {
+            lock (_lock)
+            {
+                var t = _items.Take(1).FirstOrDefault();
+                if (_items.Remove(t))
+                    OnItemRemove(t);
+                return t;
+            }
+        }
+
+        public T Get()
+        {
+            lock (_lock)
+            {
+                return _items.Take(1).FirstOrDefault();
+            }
+        }
+
+        public IEnumerable<T> GetWhile(Func<T, bool> predicate)
+        {
+            lock (_lock)
+            {
+                return _items.Where(predicate);
+            }
+        }
+
         public IEnumerator<T> GetEnumerator()
         {
             return _items.TakeWhile(item => item != null).GetEnumerator();

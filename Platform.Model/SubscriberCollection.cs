@@ -65,10 +65,48 @@ namespace Platform.Model
             Log.AppendInfo(string.Format("客户端:{0}已添加({1}{2}{3})", t.Name, t.Mac, t.IP, t.Port));
         }
 
-        public void Remove(Func<ISubscriber, bool> func)
+        public IEnumerable<ISubscriber> Take(Func<ISubscriber, bool> func)
         {
-            if (_subscribers.Count(func) <= 0) return;
-            _subscribers.Remove(func);
+            if (_subscribers.Count(func) <= 0) return null;
+            return _subscribers.TakeWhile(func);
+        }
+
+        /// <summary>
+        /// 移除并返回一个元素
+        /// </summary>
+        /// <returns></returns>
+        public ISubscriber Take()
+        {
+            return _subscribers.Take();
+        }
+
+        /// <summary>
+        /// 移除并返回满足条件的元素
+        /// </summary>
+        /// <param name="preFunc"></param>
+        /// <returns></returns>
+        public IEnumerable<ISubscriber> TakeWhile(Func<ISubscriber, bool> preFunc)
+        {
+            return _subscribers.TakeWhile(preFunc);
+        }
+
+        /// <summary>
+        /// 获取第一个元素（不移除）
+        /// </summary>
+        /// <returns></returns>
+        public ISubscriber Get()
+        {
+            return _subscribers.Get();
+        }
+
+        /// <summary>
+        /// 获取满足条件的元素（不移除）
+        /// </summary>
+        /// <param name="preFunc"></param>
+        /// <returns></returns>
+        public IEnumerable<ISubscriber> GetWhile(Func<ISubscriber, bool> preFunc)
+        {
+            return _subscribers.GetWhile(preFunc);
         }
 
         public void Add(ISubscriber subscriber)
@@ -77,7 +115,7 @@ namespace Platform.Model
             switch (count)
             {
                 case 1:
-                    _subscribers.Remove(sub => sub.Mac == subscriber.Mac);
+                    _subscribers.TakeWhile(sub => sub.Mac == subscriber.Mac);
                     _subscribers_OnItemRemove(subscriber);
                     _subscribers.Add(subscriber);
                     _subscribers_OnItemAdd(subscriber);
@@ -87,6 +125,7 @@ namespace Platform.Model
                     _subscribers_OnItemAdd(subscriber);
                     break;
                 default:
+                    Log.AppendInfo(string.Format("客户端:{0}不是唯一({1}{2}{3})", subscriber.Name, subscriber.Mac, subscriber.IP, subscriber.Port));
                     throw new Exception("不是唯一的订阅者");
             }
         }
@@ -144,6 +183,11 @@ namespace Platform.Model
         private void BoardcastError(ISubscriber subscriber, Exception ex)
         {
             OnBoardcastError(subscriber, ex);
+        }
+
+        public long Count
+        {
+            get { return _subscribers.LongCount(); }
         }
     }
 }

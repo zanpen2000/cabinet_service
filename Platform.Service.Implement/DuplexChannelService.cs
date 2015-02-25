@@ -50,7 +50,8 @@ namespace Platform.Service.Implement
                     rempEndpointMessageProperty.Port, callback, false);
                 OperationContext.Current.Channel.Closing += (sender, e) =>
                 {
-                    SubscriberCollection.Default.Remove(s => s.Mac == mac);
+                    SubscriberCollection.Default.TakeWhile(s => s.Mac == mac);
+                    
                 };
 
                 SubscriberCollection.Default.Add(subscriber);
@@ -67,7 +68,7 @@ namespace Platform.Service.Implement
 
             IDuplexChannelCallback callback = OperationContext.Current.GetCallbackChannel<IDuplexChannelCallback>();
 
-            SubscriberCollection.Default.Remove(s => s.Mac == mac);
+            SubscriberCollection.Default.TakeWhile(s => s.Mac == mac);
             callback.OnlineStateChanged(mac, OnlineState.Offline);
         }
 
