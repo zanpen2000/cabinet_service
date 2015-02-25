@@ -105,22 +105,25 @@ namespace Platform.Model
 
         public void Add(ISubscriber subscriber)
         {
-            var count = _subscribers.Count(sub => sub.Mac == subscriber.Mac);
-            switch (count)
+            lock (SyncLock)
             {
-                case 1:
-                    _subscribers.TakeWhile(sub => sub.Mac == subscriber.Mac);
-                    _subscribers_OnItemRemove(subscriber);
-                    _subscribers.Add(subscriber);
-                    _subscribers_OnItemAdd(subscriber);
-                    break;
-                case 0:
-                    _subscribers.Add(subscriber);
-                    _subscribers_OnItemAdd(subscriber);
-                    break;
-                default:
-                    Log.AppendInfo(string.Format("客户端:{0}不是唯一({1}{2}{3})", subscriber.Name, subscriber.Mac, subscriber.IP, subscriber.Port));
-                    throw new Exception("不是唯一的订阅者");
+                var count = _subscribers.Count(sub => sub.Mac == subscriber.Mac);
+                switch (count)
+                {
+                    case 1:
+                        _subscribers.TakeWhile(sub => sub.Mac == subscriber.Mac);
+                        _subscribers_OnItemRemove(subscriber);
+                        _subscribers.Add(subscriber);
+                        _subscribers_OnItemAdd(subscriber);
+                        break;
+                    case 0:
+                        _subscribers.Add(subscriber);
+                        _subscribers_OnItemAdd(subscriber);
+                        break;
+                    default:
+                        Log.AppendInfo(string.Format("客户端:{0}不是唯一({1}{2}{3})", subscriber.Name, subscriber.Mac, subscriber.IP, subscriber.Port));
+                        throw new Exception("不是唯一的订阅者");
+                }
             }
         }
 

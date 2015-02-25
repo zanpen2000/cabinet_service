@@ -53,10 +53,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="CallbackTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubscriberCollectionTests.cs" />
+    <Compile Include="ServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Platform.Layer\Platform.Layer.csproj">
+      <Project>{2ac090b5-89ed-455f-8661-7b25f9fbec66}</Project>
+      <Name>Platform.Layer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Platform.Model\Platform.Model.csproj">
       <Project>{AC8D5D95-21F8-4DEF-9969-CB4753B3F872}</Project>
       <Name>Platform.Model</Name>
@@ -65,6 +71,13 @@
       <Project>{6430DC14-1159-456A-9B96-12897749C7AE}</Project>
       <Name>Platform.Service.Contracts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Platform.Service.Implement\Platform.Service.Implement.csproj">
+      <Project>{8252E381-9688-485E-AA93-5255C8367805}</Project>
+      <Name>Platform.Service.Implement</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

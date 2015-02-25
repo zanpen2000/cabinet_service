@@ -66,7 +66,7 @@ namespace Platform.Layer
                 throw new ArgumentNullException("baseAddr");
             }
 
-            var svrName = typeof(TSvc).ToString().Split('.')[1].Substring(1);
+            var svrName = typeof(TSvc).ToString().Split('.')[3].Substring(1);
 
             if (string.IsNullOrEmpty(svrName))
             {
