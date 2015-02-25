@@ -65,12 +65,6 @@ namespace Platform.Model
             Log.AppendInfo(string.Format("客户端:{0}已添加({1}{2}{3})", t.Name, t.Mac, t.IP, t.Port));
         }
 
-        public IEnumerable<ISubscriber> Take(Func<ISubscriber, bool> func)
-        {
-            if (_subscribers.Count(func) <= 0) return null;
-            return _subscribers.TakeWhile(func);
-        }
-
         /// <summary>
         /// 移除并返回一个元素
         /// </summary>

@@ -7,12 +7,16 @@ using Platform.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Model.Interfaces;
 using Platform.Service.Contracts;
+using System.Threading.Tasks;
 
 namespace Platform.Model.Tests
 {
     [TestClass()]
     public class SubscriberCollectionTests
     {
+        /// <summary>
+        /// 添加和移除
+        /// </summary>
         [TestMethod()]
         public void AddAndRemoveTest()
         {
@@ -47,7 +51,48 @@ namespace Platform.Model.Tests
             SubscriberCollection.Default.TakeWhile(t => t.Mac == "client1_mac");
             Assert.AreEqual(0, SubscriberCollection.Default.Count);
         }
+
+        /// <summary>
+        /// 并发添加和移除
+        /// </summary>
+        [TestMethod]
+        public void ThreadAddAndRemoveTest()
+        {
+            CallbackTest cbtest = new CallbackTest();
+
+            //顺序添加多个
+            for (int i = 0; i < 10; i++)
+            {
+                string name = "client" + i.ToString();
+                ISubscriber sub = new Subscriber(name, name + "_mac", name + "_ip", i, cbtest);
+                SubscriberCollection.Default.Add(sub);
+            }
+
+            Assert.AreEqual(10, SubscriberCollection.Default.Count);
+
+            //并发添加多个
+            Parallel.For(10, 20, i =>
+            {
+                string name = "client" + i.ToString();
+                ISubscriber sub = new Subscriber(name, name + "_mac", name + "_ip", i, cbtest);
+                SubscriberCollection.Default.Add(sub);
+            });
+
+            Assert.AreEqual(20, SubscriberCollection.Default.Count);
+
+            //移除
+            Parallel.For(0, 10, i =>
+            {
+                SubscriberCollection.Default.Take();
+            });
+
+            Assert.AreEqual(10, SubscriberCollection.Default.Count);
+
+
+        }
     }
+
+
 
     public class CallbackTest : IDuplexChannelCallback
     {
