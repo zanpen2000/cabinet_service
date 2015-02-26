@@ -16,6 +16,8 @@ namespace Platform.Service.Implement.Tests
         private string notifyMsg;
         private int ClientCount;
 
+        private static readonly object locker = new object();
+
         public ServiceTest()
         {
             ClientCount = 0;
@@ -45,24 +47,19 @@ namespace Platform.Service.Implement.Tests
         [TestMethod()]
         public void OnOffLineTest()
         {
-            i = 0;
             DuplexService.Online("c1", "c1_mac");
             waitCallback();
 
-            i = 0;
             DuplexService.GetClients();
             waitCallback();
 
             Assert.AreEqual(1, ClientCount);
 
-            i = 0;
             DuplexService.Offline("c1_mac");
             waitCallback();
 
-            i = 0;
             DuplexService.GetClients();
             waitCallback();
-
 
             Assert.AreEqual(0, ClientCount);
 
@@ -71,14 +68,14 @@ namespace Platform.Service.Implement.Tests
         public void OnlineStateChanged(string mac, OnlineState state)
         {
             TestContext.WriteLine("客户端：{0} 状态: {1}", mac, state.ToString());
-            ++i;
+            i++;
         }
 
         public void NotifyMessage(string msg)
         {
             notifyMsg = msg;
             TestContext.WriteLine("接收广播：" + msg);
-            ++i;
+            i++;
         }
 
         public void ReturnClients(System.Collections.Generic.IEnumerable<string> clientMacs)
@@ -92,16 +89,20 @@ namespace Platform.Service.Implement.Tests
                 TestContext.WriteLine("\t" + mac);
                 ClientCount += 1;
             }
-            ++i;
+            i++;
         }
 
         private int i = 0;
 
         private void waitCallback()
         {
-            while (i == 0)
+            lock (locker)
             {
-                System.Threading.Thread.Sleep(500);
+                while (i == 0)
+                {
+                    System.Threading.Thread.Sleep(500);
+                }
+                i = 0;
             }
         }
 
@@ -142,24 +143,63 @@ namespace Platform.Service.Implement.Tests
             Assert.AreEqual("1", notifyMsg);
         }
 
+        /// <summary>
+        /// 客户端重复注册测试
+        /// </summary>
         [TestMethod()]
         public void RepeatRegClientTest()
         {
-            i = 0;
-            DuplexService.Online("c1", "c1_mac");
-            waitCallback();
+            if (!SingleService.Exists("c1_mac"))
+            {
+                DuplexService.Online("c1", "c1_mac");
+                waitCallback();
+            }
 
-            i = 0;
-            DuplexService.Online("c1", "c1_mac");
-            waitCallback();
+            if (!SingleService.Exists("c1_mac"))
+            {
+                DuplexService.Online("c1", "c1_mac");
+                waitCallback();
+            }
 
-            i = 0;
-            DuplexService.Online("c2", "c2_mac");
-            waitCallback();
+            if (!SingleService.Exists("c1_mac"))
+            {
+                DuplexService.Online("c1", "c1_mac");
+                waitCallback();
+            }
+
+            if (!SingleService.Exists("c2_mac"))
+            {
+                DuplexService.Online("c2", "c2_mac");
+                waitCallback();
+            }
+
+
+            if (!SingleService.Exists("c2_mac"))
+            {
+                DuplexService.Online("c2", "c2_mac");
+                waitCallback();
+            }
+
+            if (!SingleService.Exists("c2_mac"))
+            {
+                DuplexService.Online("c2", "c2_mac");
+                waitCallback();
+            }
+
 
             var clients = SingleService.GetClients();
 
             Assert.AreEqual(2, clients.Count);
+
+            if (SingleService.Exists("c2_mac"))
+            {
+                DuplexService.Offline("c2_mac");
+                waitCallback();
+            }
+
+            clients = SingleService.GetClients();
+
+            Assert.AreEqual(1, clients.Count);
         }
     }
 }

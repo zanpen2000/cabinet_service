@@ -13,5 +13,8 @@ namespace Platform.Service.Contracts
 
         [OperationContract]
         List<string> GetClients();
+
+        [OperationContract]
+        bool Exists(string mac);
     }
 }

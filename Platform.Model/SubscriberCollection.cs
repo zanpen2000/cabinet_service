@@ -81,6 +81,7 @@ namespace Platform.Model
         /// <returns></returns>
         public IEnumerable<ISubscriber> TakeWhile(Func<ISubscriber, bool> preFunc)
         {
+            
             return _subscribers.TakeWhile(preFunc);
         }
 
@@ -107,23 +108,10 @@ namespace Platform.Model
         {
             lock (SyncLock)
             {
-                var count = _subscribers.Count(sub => sub.Mac == subscriber.Mac);
-                switch (count)
-                {
-                    case 1:
-                        _subscribers.TakeWhile(sub => sub.Mac == subscriber.Mac);
-                        _subscribers_OnItemRemove(subscriber);
-                        _subscribers.Add(subscriber);
-                        _subscribers_OnItemAdd(subscriber);
-                        break;
-                    case 0:
-                        _subscribers.Add(subscriber);
-                        _subscribers_OnItemAdd(subscriber);
-                        break;
-                    default:
-                        Log.AppendInfo(string.Format("客户端:{0}不是唯一({1}{2}{3})", subscriber.Name, subscriber.Mac, subscriber.IP, subscriber.Port));
-                        throw new Exception("不是唯一的订阅者");
-                }
+                var count = _subscribers.Count(sub => sub.Mac.Equals(subscriber.Mac));
+                if (count != 0) return;
+
+                _subscribers.Add(subscriber);
             }
         }
 

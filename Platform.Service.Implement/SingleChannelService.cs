@@ -39,5 +39,11 @@ namespace Platform.Service.Implement
             var lst = from n in SubscriberCollection.Default.Subscribers select n.Mac;
             return lst.ToList();
         }
+
+
+        public bool Exists(string mac)
+        {
+            return SubscriberCollection.Default.Subscribers.Count(sub => sub.Mac.Equals(mac)) > 0;
+        }
     }
 }

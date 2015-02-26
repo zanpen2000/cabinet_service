@@ -46,7 +46,7 @@ namespace Platform.Model
         {
             lock (_lock)
             {
-                var lst = new List<T>(_items.TakeWhile(predicate));
+                var lst = new List<T>(_items.Where(predicate));
                 foreach (var l in lst)
                 {
                     if (_items.Remove(l))

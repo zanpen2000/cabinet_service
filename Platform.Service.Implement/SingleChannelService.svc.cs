@@ -14,5 +14,11 @@ namespace Platform.Service.Implement
         {
             return SingleChannelService.Default.GetClients();
         }
+
+
+        public bool Exists(string mac)
+        {
+            return SingleChannelService.Default.Exists(mac);
+        }
     }
 }

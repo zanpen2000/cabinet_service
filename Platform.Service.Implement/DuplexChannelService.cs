@@ -89,10 +89,8 @@ namespace Platform.Service.Implement
 
         public void GetClients()
         {
-            var callback = OperationContext.Current.GetCallbackChannel<IDuplexChannelCallback>();
-
             var lst = from n in SubscriberCollection.Default.Subscribers select n.Mac;
-
+            var callback = OperationContext.Current.GetCallbackChannel<IDuplexChannelCallback>();
             callback.ReturnClients(lst);
         }
     }
